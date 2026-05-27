@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Slack Dark Mode
 // @namespace    https://github.com/BarnsAWS/Amazon-Slack-Dark-Mode-TamperMonkey-Script
-// @version      1.1.0
+// @version      1.2.0
 // @match        https://amazon.enterprise.slack.com/*
 // @match        https://*.enterprise.slack.com/*
 // @match        https://*.slack.com/signin*
@@ -17,7 +17,7 @@
 (function () {
     'use strict';
 
-    // Early paint — eliminate white flash.
+    // === EARLY PAINT ===
     try {
         if (document.documentElement) {
             document.documentElement.style.backgroundColor = '#161d26';
@@ -25,167 +25,168 @@
         }
     } catch (_) {}
 
+    const PALETTE = {
+        BODY:    '#161d26',
+        SURFACE: '#1b232d',
+        HOVER:   '#232b37',
+        BORDER:  '#424650',
+        TEXT:    '#e9edf2',
+        MUTED:   '#a1a8b3',
+        LINK:    '#42b4ff',
+    };
+
     const STYLE_ID = 'barnsaws-slack-dark-mode-style';
     const CSS = `
 :root { color-scheme: dark !important; }
 
 html, body {
-    background-color: #161d26 !important;
-    color: #e9edf2 !important;
-    -webkit-text-fill-color: #e9edf2 !important;
+    background-color: ${PALETTE.BODY} !important;
+    color: ${PALETTE.TEXT} !important;
+    -webkit-text-fill-color: ${PALETTE.TEXT} !important;
 }
 
-/* === SLACK LOGO AREA (upper-left) ===
-   The Slack logo is black SVG text on a dark header — lighten the header
-   background so the logo is visible. */
+/* === HEADER / TOP NAV — paint LIGHTER than body so black Slack logo is visible === */
 header, [class*="header"], [class*="Header"],
 [class*="top_nav"], [class*="TopNav"], [class*="p-top_nav"],
 [class*="client_header"], [class*="workspace_header"],
-nav, [role="banner"] {
-    background-color: #232b37 !important;
-    border-bottom: 1px solid #424650 !important;
+[class*="p-page_header"], [class*="PageHeader"],
+[class*="c-base_layout__header"], [class*="navbar"], [class*="Navbar"],
+nav, [role="banner"], [role="navigation"] {
+    background-color: ${PALETTE.HOVER} !important;
+    background-image: none !important;
+    border-bottom: 1px solid ${PALETTE.BORDER} !important;
+    color: ${PALETTE.TEXT} !important;
+    -webkit-text-fill-color: ${PALETTE.TEXT} !important;
 }
 
-/* Slack logo SVG — invert so black text becomes white on the dark header */
+/* Slack logo SVG — invert so black text becomes white */
 header svg, [class*="header"] svg, [class*="Header"] svg,
 nav svg, [role="banner"] svg,
 [class*="slack_logo"], [class*="SlackLogo"],
-[class*="c-slacklogo"], [aria-label*="Slack"] {
+[class*="c-slacklogo"],
+img[alt*="Slack"], img[src*="slack-logo"] {
     filter: invert(1) brightness(2) !important;
 }
 
-/* === MAIN CONTENT AREA === */
-main, [role="main"], [class*="content"], [class*="Content"],
-[class*="page"], [class*="Page"], [class*="wrapper"], [class*="Wrapper"],
-[class*="container"], [class*="Container"],
-[class*="workspace"], [class*="Workspace"],
-[class*="body"], [class*="Body"],
-section, article, div[class] {
-    background-color: #161d26 !important;
-    color: #e9edf2 !important;
-    -webkit-text-fill-color: #e9edf2 !important;
+/* === SHELL / LAYOUT === */
+[class*="c-base_layout"], [class*="p-base_layout"],
+[class*="p-workspace_index"], [class*="p-team_directory"],
+[class*="p-marketing"], [class*="p-page"],
+[class*="layout"], [class*="Layout"],
+[class*="wrapper"], [class*="Wrapper"],
+main, [role="main"], section, article {
+    background-color: ${PALETTE.BODY} !important;
+    color: ${PALETTE.TEXT} !important;
+    -webkit-text-fill-color: ${PALETTE.TEXT} !important;
 }
 
-/* === SIGN-IN / WORKSPACE PICKER CARD === */
+/* === CARDS / TILES / PANELS === */
 [class*="card"], [class*="Card"],
 [class*="panel"], [class*="Panel"],
 [class*="modal"], [class*="Modal"],
 [class*="dialog"], [class*="Dialog"],
+[class*="tile"], [class*="Tile"],
 [class*="form"], [class*="Form"],
 [class*="auth"], [class*="Auth"],
 [class*="signin"], [class*="SignIn"],
 [class*="login"], [class*="Login"],
 [class*="workspace_list"], [class*="WorkspaceList"],
 [class*="team_list"], [class*="TeamList"],
-[class*="get_started"], [class*="GetStarted"] {
-    background-color: #1b232d !important;
-    border: 1px solid #424650 !important;
-    color: #e9edf2 !important;
-    -webkit-text-fill-color: #e9edf2 !important;
-}
-
-/* Workspace tiles / team cards */
 [class*="workspace_card"], [class*="WorkspaceCard"],
 [class*="team_card"], [class*="TeamCard"],
 [class*="workspace_item"], [class*="WorkspaceItem"],
 [class*="team_item"], [class*="TeamItem"],
-[class*="p-workspace_list_item"], [class*="p-team_list_item"] {
-    background-color: #1b232d !important;
-    border: 1px solid #424650 !important;
-}
-[class*="workspace_card"]:hover, [class*="WorkspaceCard"]:hover,
-[class*="team_card"]:hover, [class*="TeamCard"]:hover,
-[class*="workspace_item"]:hover, [class*="WorkspaceItem"]:hover {
-    background-color: #232b37 !important;
-}
-
-/* Search box */
-input, textarea, select, [role="searchbox"], [role="combobox"] {
-    background-color: #0a0f15 !important;
-    color: #e9edf2 !important;
-    -webkit-text-fill-color: #e9edf2 !important;
-    border: 1px solid #424650 !important;
-    caret-color: #e9edf2 !important;
-}
-::placeholder {
-    color: #a1a8b3 !important;
-    -webkit-text-fill-color: #a1a8b3 !important;
-    opacity: 1 !important;
+[class*="get_started"], [class*="GetStarted"],
+[class*="banner"], [class*="Banner"],
+[class*="recommendation"], [class*="Recommendation"],
+[class*="notice"], [class*="Notice"],
+[class*="info"], [class*="Info"] {
+    background-color: ${PALETTE.SURFACE} !important;
+    border-color: ${PALETTE.BORDER} !important;
+    color: ${PALETTE.TEXT} !important;
+    -webkit-text-fill-color: ${PALETTE.TEXT} !important;
 }
 
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-    color: #e9edf2 !important;
-    -webkit-text-fill-color: #e9edf2 !important;
+[class*="card"]:hover, [class*="Card"]:hover,
+[class*="tile"]:hover, [class*="Tile"]:hover,
+[class*="workspace_item"]:hover, [class*="WorkspaceItem"]:hover,
+[class*="team_item"]:hover, [class*="TeamItem"]:hover {
+    background-color: ${PALETTE.HOVER} !important;
 }
 
-/* Body text */
-p, span, label, li, td, th, dt, dd {
-    color: #e9edf2 !important;
-    -webkit-text-fill-color: #e9edf2 !important;
+/* Headings / text */
+h1, h2, h3, h4, h5, h6, p, span, label, li, td, th, dt, dd, div {
+    color: ${PALETTE.TEXT} !important;
+    -webkit-text-fill-color: ${PALETTE.TEXT} !important;
 }
 
 /* Muted / secondary text */
 [class*="muted"], [class*="Muted"], [class*="secondary"], [class*="Secondary"],
 [class*="subtitle"], [class*="Subtitle"], [class*="hint"], [class*="Hint"],
-small, [class*="fine_print"] {
-    color: #a1a8b3 !important;
-    -webkit-text-fill-color: #a1a8b3 !important;
+[class*="description"], [class*="Description"],
+small, [class*="fine_print"], [class*="FinePrint"] {
+    color: ${PALETTE.MUTED} !important;
+    -webkit-text-fill-color: ${PALETTE.MUTED} !important;
 }
 
 /* Links */
 a, [role="link"] {
-    color: #42b4ff !important;
-    -webkit-text-fill-color: #42b4ff !important;
+    color: ${PALETTE.LINK} !important;
+    -webkit-text-fill-color: ${PALETTE.LINK} !important;
 }
 a:hover, a:focus-visible {
     color: #79c0ff !important;
     -webkit-text-fill-color: #79c0ff !important;
 }
 
-/* Primary CTA buttons — preserve Slack's green/brand color */
+/* Inputs / search */
+input, textarea, select, [role="searchbox"], [role="combobox"], [role="textbox"] {
+    background-color: #0a0f15 !important;
+    color: ${PALETTE.TEXT} !important;
+    -webkit-text-fill-color: ${PALETTE.TEXT} !important;
+    border: 1px solid ${PALETTE.BORDER} !important;
+    caret-color: ${PALETTE.TEXT} !important;
+}
+::placeholder, ::-webkit-input-placeholder, ::-moz-placeholder {
+    color: ${PALETTE.MUTED} !important;
+    -webkit-text-fill-color: ${PALETTE.MUTED} !important;
+    opacity: 1 !important;
+}
+
+/* Primary CTA buttons — preserve Slack brand green/etc. */
 [class*="btn-primary"], [class*="c-button--primary"],
-[class*="ladda-button"], [class*="p-download_modal__button"],
+[class*="ladda-button"],
 button[data-qa="sign_in_button"],
-[style*="background-color: rgb(0"], [style*="background-color: #"] {
+[class*="p-download_modal__button"] {
     background-color: revert !important;
+    background-image: revert !important;
     color: revert !important;
     -webkit-text-fill-color: revert !important;
     border-color: revert !important;
     filter: none !important;
 }
 
-/* "Launch in Slack" / secondary buttons */
-[class*="btn-secondary"], [class*="c-button--outline"],
-[class*="btn-link"], button:not([class*="primary"]):not([class*="ladda"]):not([class*="sign_in"]) {
-    background-color: #232b37 !important;
-    color: #e9edf2 !important;
-    -webkit-text-fill-color: #e9edf2 !important;
-    border: 1px solid #424650 !important;
+/* Secondary buttons */
+[class*="btn-secondary"], [class*="c-button--outline"], [class*="btn-link"],
+button:not([class*="primary"]):not([class*="ladda"]):not([class*="sign_in"]) {
+    background-color: ${PALETTE.HOVER} !important;
+    color: ${PALETTE.TEXT} !important;
+    -webkit-text-fill-color: ${PALETTE.TEXT} !important;
+    border: 1px solid ${PALETTE.BORDER} !important;
 }
 
 /* Borders / dividers */
-hr, [class*="divider"], [class*="Divider"], [class*="separator"], [class*="Separator"] {
-    border-color: #424650 !important;
-    background-color: #424650 !important;
+hr, [class*="divider"], [class*="Divider"],
+[class*="separator"], [class*="Separator"] {
+    border-color: ${PALETTE.BORDER} !important;
+    background-color: ${PALETTE.BORDER} !important;
 }
 
 /* Footer */
 footer, [class*="footer"], [class*="Footer"] {
-    background-color: #161d26 !important;
-    color: #a1a8b3 !important;
-    -webkit-text-fill-color: #a1a8b3 !important;
-}
-
-/* "Recommended workspaces" / info banners */
-[class*="banner"], [class*="Banner"],
-[class*="notice"], [class*="Notice"],
-[class*="info"], [class*="Info"],
-[class*="recommendation"], [class*="Recommendation"] {
-    background-color: #1b232d !important;
-    border: 1px solid #424650 !important;
-    color: #e9edf2 !important;
-    -webkit-text-fill-color: #e9edf2 !important;
+    background-color: ${PALETTE.BODY} !important;
+    color: ${PALETTE.MUTED} !important;
+    -webkit-text-fill-color: ${PALETTE.MUTED} !important;
 }
 
 /* Focus ring */
@@ -195,44 +196,127 @@ footer, [class*="footer"], [class*="Footer"] {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 10px !important; background: #161d26 !important; }
-::-webkit-scrollbar-track { background: #161d26 !important; }
-::-webkit-scrollbar-thumb { background: #424650 !important; border-radius: 5px !important; }
+::-webkit-scrollbar { width: 10px !important; background: ${PALETTE.BODY} !important; }
+::-webkit-scrollbar-track { background: ${PALETTE.BODY} !important; }
+::-webkit-scrollbar-thumb { background: ${PALETTE.BORDER} !important; border-radius: 5px !important; }
 ::-webkit-scrollbar-thumb:hover { background: #5a6b8a !important; }
-* { scrollbar-color: #424650 #161d26 !important; scrollbar-width: thin !important; }
+* { scrollbar-color: ${PALETTE.BORDER} ${PALETTE.BODY} !important; scrollbar-width: thin !important; }
 
-/* Media exemption — authored images (workspace icons, people illustrations) */
+/* Inline-style white override */
+[style*="background-color: rgb(255, 255, 255)"]:not(img):not(video):not(canvas):not(svg):not(picture):not(iframe),
+[style*="background-color: white"]:not(img):not(video):not(canvas):not(svg):not(picture):not(iframe),
+[style*="background-color:#fff"]:not(img):not(video):not(canvas):not(svg):not(picture):not(iframe),
+[style*="background: rgb(255, 255, 255)"]:not(img):not(video):not(canvas):not(svg):not(picture):not(iframe),
+[style*="background: white"]:not(img):not(video):not(canvas):not(svg):not(picture):not(iframe),
+[style*="background:#fff"]:not(img):not(video):not(canvas):not(svg):not(picture):not(iframe),
+[style*="background-color: #ffffff"]:not(img):not(video):not(canvas):not(svg):not(picture):not(iframe),
+[style*="background: #ffffff"]:not(img):not(video):not(canvas):not(svg):not(picture):not(iframe) {
+    background-color: ${PALETTE.SURFACE} !important;
+}
+
+/* Media exemption */
 img, video, canvas, picture, iframe, object, embed {
     background-color: transparent !important;
     filter: none !important;
 }
-
-/* Inline-style white override (catch-all for Slack's inline bg paints) */
-[style*="background-color: rgb(255, 255, 255)"],
-[style*="background-color: white"],
-[style*="background-color:#fff"],
-[style*="background: rgb(255, 255, 255)"],
-[style*="background: white"],
-[style*="background:#fff"],
-[style*="background: #fff"],
-[style*="background-color: #ffffff"],
-[style*="background: #ffffff"] {
-    background-color: #1b232d !important;
-}
 `;
 
-    function inject() {
+    const STYLE_TEXT = CSS;
+
+    function injectStyle() {
         if (document.getElementById(STYLE_ID)) return;
         const parent = document.head || document.documentElement;
-        if (!parent) { requestAnimationFrame(inject); return; }
+        if (!parent) { requestAnimationFrame(injectStyle); return; }
         const style = document.createElement('style');
         style.id = STYLE_ID;
-        style.textContent = CSS;
+        style.textContent = STYLE_TEXT;
         parent.appendChild(style);
         if (typeof GM_addStyle === 'function') {
-            try { GM_addStyle(CSS); } catch (_) {}
+            try { GM_addStyle(STYLE_TEXT); } catch (_) {}
         }
     }
 
-    inject();
+    // === JS NUCLEAR PASS — luminance-bucket any remaining light surface ===
+    const EXCLUDED_TAGS = new Set(['IMG','VIDEO','CANVAS','SVG','PATH','CIRCLE','RECT','POLYGON','LINE','POLYLINE','ELLIPSE','G','DEFS','USE','SYMBOL','CLIPPATH','MASK','TEXT','TSPAN','PICTURE','IFRAME','OBJECT','EMBED']);
+
+    function parseRgb(s) {
+        if (typeof s !== 'string') return null;
+        const m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?/i.exec(s);
+        if (!m) return null;
+        const a = m[4] !== undefined ? parseFloat(m[4]) : 1;
+        if (a < 0.5) return null;
+        return [+m[1], +m[2], +m[3]];
+    }
+
+    function lum(r, g, b) { return 0.299 * r + 0.587 * g + 0.114 * b; }
+
+    function nuclearPass() {
+        let all;
+        try { all = document.querySelectorAll('*'); } catch (_) { return; }
+        for (let i = 0; i < all.length; i++) {
+            const el = all[i];
+            const tag = el.tagName ? el.tagName.toUpperCase() : '';
+            if (EXCLUDED_TAGS.has(tag)) continue;
+            if (el.closest && el.closest('svg, iframe, object, embed, [class*="slack_logo"], [class*="SlackLogo"]')) continue;
+            let cs;
+            try { cs = getComputedStyle(el); } catch (_) { continue; }
+            const bg = parseRgb(cs.backgroundColor);
+            if (bg) {
+                const L = lum(bg[0], bg[1], bg[2]);
+                let target = null;
+                if (L > 200) target = PALETTE.BODY;
+                else if (L >= 140) target = PALETTE.SURFACE;
+                else if (L >= 100) target = PALETTE.HOVER;
+                if (target) {
+                    try { el.style.setProperty('background-color', target, 'important'); } catch (_) {}
+                }
+            }
+            const txt = parseRgb(cs.color);
+            if (txt) {
+                const tL = lum(txt[0], txt[1], txt[2]);
+                if (tL < 120) {
+                    const isLink = (tag === 'A') || (el.closest && el.closest('a, [role="link"]'));
+                    const c = isLink ? PALETTE.LINK : PALETTE.TEXT;
+                    try {
+                        el.style.setProperty('color', c, 'important');
+                        el.style.setProperty('-webkit-text-fill-color', c, 'important');
+                    } catch (_) {}
+                }
+            }
+        }
+    }
+
+    // Debounced observer for dynamic content
+    let timer = null;
+    function scheduleSweep() {
+        if (timer != null) return;
+        timer = setTimeout(() => { timer = null; nuclearPass(); }, 250);
+    }
+
+    function attachObserver() {
+        const target = document.documentElement || document.body;
+        if (!target) { requestAnimationFrame(attachObserver); return; }
+        if (typeof MutationObserver !== 'function') return;
+        try {
+            new MutationObserver(scheduleSweep).observe(target, {
+                childList: true, subtree: true,
+                attributes: true, attributeFilter: ['style', 'class'],
+            });
+        } catch (_) {}
+    }
+
+    function scheduleSafetyPasses() {
+        if (typeof window === 'undefined') return;
+        const fire = () => {
+            setTimeout(nuclearPass, 500);
+            setTimeout(nuclearPass, 1500);
+            setTimeout(nuclearPass, 3000);
+        };
+        if (document.readyState === 'complete') fire();
+        else window.addEventListener('load', fire, { once: true });
+    }
+
+    injectStyle();
+    attachObserver();
+    scheduleSafetyPasses();
 })();
