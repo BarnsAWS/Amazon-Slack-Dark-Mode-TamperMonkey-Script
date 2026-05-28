@@ -70,5 +70,5 @@ This Userscript covers Slack's web-rendered pre-auth pages on `amazon.enterprise
 
 - AWS Cloudscape Dark Mode Standard for LLM v3.3 — palette tokens, JS Nuclear Pass, Observer Pattern, anti-patterns.
 - Amazon Dark Mode LLM Playbook v1.0 — folder/file scheme, source-notation rules, repository initialization workflow.
-- BarnsAWS Dark Mode Rules v2026-05-22 (`Documents\Coding Standards and Guides\BarnsAWS Dark Mode\Rules.md`) — Section 3.12 Authored Embedded Content Carve-Out, Section 3.13 Defensive Selector Discipline.
+- BarnsAWS Dark Mode Rules v2026-05-22 (BarnsAWS Dark Mode Rules) — Section 3.12 Authored Embedded Content Carve-Out, Section 3.13 Defensive Selector Discipline.
 - Firefox Amazon Quick Dark Mode MCP Reproduction Guide v1.0 — extension-boundary fallback path.
